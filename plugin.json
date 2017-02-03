@@ -1,0 +1,14 @@
+{
+    "title": "Minecraft Map Reader",
+    "version": "0.2",
+
+    "description": "Imports Minecraft worlds, just place a Minecraft's 'world' folder inside chunks saves.",
+	"icon": "icon.png",
+    "authors": [ "Stubenhocker1399" ],
+    "tags": [ "generator" ],
+	"requires":
+	[
+	   { "name": "TerrainBlocks", "id": 576064238 }
+	],
+  "scripts": ["Binaries/MinecraftMapReader.dll"]
+}
