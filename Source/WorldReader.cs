@@ -7,6 +7,7 @@ using Chunks.Plugins;
 using Chunks.Entities;
 using Core;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace MinecraftMapReader.Source
 {
@@ -27,7 +28,42 @@ namespace MinecraftMapReader.Source
             Compound = 10,
             Int_Array = 11
         }
-
+        Dictionary<int, Block> Blocks = new Dictionary<int, Block>
+        {
+            { 1, Plugin.GetResource<Block>("MinecraftBlocks.MinecraftStone") },
+            { 2, Plugin.GetResource<Block>("MinecraftBlocks.MinecraftGrass") },
+            { 3, Plugin.GetResource<Block>("MinecraftBlocks.MinecraftDirt") },
+            { 4, Plugin.GetResource<Block>("MinecraftBlocks.Cobble") },
+            { 5, Plugin.GetResource<Block>("BasicTerrain.Test") },
+            { 7, Plugin.GetResource<Block>("MinecraftBlocks.MinecraftBedrock") },
+            { 14, Plugin.GetResource<Block>("MinecraftBlocks.GoldOre") },
+            { 15, Plugin.GetResource<Block>("MinecraftBlocks.IronOre") },
+            { 16, Plugin.GetResource<Block>("MinecraftBlocks.CoalOre") },
+            { 17, Plugin.GetResource<Block>("BasicTerrain.Trunk") },
+            { 18, Plugin.GetResource<Block>("BasicTerrain.Leaves") },
+            { 20, Plugin.GetResource<Block>("MinecraftBlocks.Glass") },
+            { 21, Plugin.GetResource<Block>("MinecraftBlocks.LapisOre") },
+            { 22, Plugin.GetResource<Block>("MinecraftBlocks.Lapis") },
+            { 35, Plugin.GetResource<Block>("MinecraftBlocks.WoolWhite") },
+            { 41, Plugin.GetResource<Block>("MinecraftBlocks.Gold") },
+            { 42, Plugin.GetResource<Block>("MinecraftBlocks.Iron") },
+            { 45, Plugin.GetResource<Block>("MinecraftBlocks.Brick") },
+            { 48, Plugin.GetResource<Block>("MinecraftBlocks.MossyCobble") },
+            { 56, Plugin.GetResource<Block>("MinecraftBlocks.DiamondOre") },
+            { 57, Plugin.GetResource<Block>("MinecraftBlocks.Diamond") },
+            { 73, Plugin.GetResource<Block>("MinecraftBlocks.RedstoneOre") },
+            { 89, Plugin.GetResource<Block>("MinecraftBlocks.Glowstone") },
+            { 95, Plugin.GetResource<Block>("MinecraftBlocks.Glass") },
+            { 98, Plugin.GetResource<Block>("MinecraftBlocks.Brick") },
+            { 121, Plugin.GetResource<Block>("MinecraftBlocks.EndStone") },
+            { 129, Plugin.GetResource<Block>("MinecraftBlocks.EmeraldOre") },
+            { 133, Plugin.GetResource<Block>("MinecraftBlocks.Emerald") },
+            { 152, Plugin.GetResource<Block>("MinecraftBlocks.Redstone") },
+            { 159, Plugin.GetResource<Block>("MinecraftBlocks.ClayWhite") },
+            { 172, Plugin.GetResource<Block>("MinecraftBlocks.ClayHard") },
+            { 173, Plugin.GetResource<Block>("MinecraftBlocks.Coal") },
+            { 206, Plugin.GetResource<Block>("MinecraftBlocks.EndBricks") }
+        };
         static string worldfolder;// = "C:\\Users\\Chris\\AppData\\LocalLow\\Facepunch Studios\\Chunks\\Worlds\\world";
         [ThreadStatic]
         static byte[] chunkData;
@@ -377,124 +413,11 @@ namespace MinecraftMapReader.Source
                             for (var y = 0; y < 16; y++)
                             {
                                 int BlockPos = y*16*16+z*16+x;
-                                byte BlockID_a = blocks[BlockPos];
-                                /*if(BlockID_a != 0)
-                                {
-                                    var grassBlock = GetBlock("Grass", ((float)ran.NextDouble() - 0.5f) * 0.25f);
-                                    chunks.Set(new IntVector(x+chunks.Min.X, y+(16*yLevel), z+chunks.Min.Z), grassBlock);
-                                }*/
-                                var block = Plugin.GetResource<Block>("Core.Test");
-                                switch (BlockID_a)
-                                {
-                                    /*
-                                     
-                                    case :
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.");
-                                        break;
-                                    
-                                     */
-                                    case 1://Stone
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.MinecraftStone");
-                                        break;
-                                    case 2://Grass
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.MinecraftGrass");
-                                        break;
-                                    case 3://Dirt
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.MinecraftDirt");
-                                        break;
-                                    case 4:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.Cobble");
-                                        break;
-                                    case 5://Plank
-                                        block = Plugin.GetResource<Block>("BasicTerrain.Test");
-                                        break;
-                                    case 7://Bedrock
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.MinecraftBedrock");
-                                        break;
-                                    case 14:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.GoldOre");
-                                        break;
-                                    case 15:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.IronOre");
-                                        break;
-                                    case 16:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.CoalOre");
-                                        break;
-                                    case 17://Log
-                                        block = GetBlock("Trunk", 1);
-                                        break;
-                                    case 18://Leaves
-                                        block = GetBlock("Leaves", 1);
-                                        break;
-                                    case 20:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.Glass");
-                                        break;
-                                    case 21:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.LapisOre");
-                                        break;
-                                    case 22:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.Lapis");
-                                        break;
-                                    case 35:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.WoolWhite");
-                                        break;
-                                    case 41:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.Gold");
-                                        break;
-                                    case 42:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.Iron");
-                                        break;
-                                    case 45:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.Brick");
-                                        break;
-                                    case 48:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.MossyCobble");
-                                        break;
-                                    case 56:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.DiamondOre");
-                                        break;
-                                    case 57:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.Diamond");
-                                        break;
-                                    case 73:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.RedstoneOre");
-                                        break;
-                                    case 89:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.Glowstone");
-                                        break;
-                                    case 95:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.Glass");
-                                        break;
-                                    case 98:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.Brick");
-                                        break;
-                                    case 121:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.EndStone");
-                                        break;
-                                    case 129:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.EmeraldOre");
-                                        break;
-                                    case 133:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.Emerald");
-                                        break;
-                                    case 152:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.Redstone");
-                                        break;
-                                    case 159:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.ClayWhite");
-                                        break;
-                                    case 172:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.ClayHard");
-                                        break;
-                                    case 173:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.Coal");
-                                        break;
-                                    case 206:
-                                        block = Plugin.GetResource<Block>("MinecraftBlocks.EndBricks");
-                                        break;
-                                    default:
-                                        break;
-                                }
+                                byte BlockID_a = blocks[BlockPos];                                
+                                Block block;
+                                Blocks.TryGetValue(BlockID_a, out block);
+                                if (block==default(Block))
+                                    block = Plugin.GetResource<Block>("Core.Test"); ;
                                 if (BlockID_a != 0)
                                     chunks.Set(new IntVector(x + chunks.Min.X, y + (16 * yLevel), (15-z) + chunks.Min.Z), block);
                             }
@@ -622,6 +545,7 @@ namespace MinecraftMapReader.Source
             return (buf[i] << 24) | (buf[i + 1] << 16) | (buf[i + 2] << 8) | buf[i + 3];
         }
     }
+    
     public static class MissingExtensions
     {
         /// Only useful before .NET 4
