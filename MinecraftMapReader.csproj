@@ -53,6 +53,10 @@
       <Private>false</Private>
       <SpecificVersion>false</SpecificVersion>
     </Reference>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{5266CF11-04D5-4678-851B-E9F95A9CAEF7}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TerrainBlocks\TerrainBlocks.csproj">
       <Project>{6f0c8d87-7146-44c8-a5de-3fb447d44406}</Project>
       <Name>TerrainBlocks</Name>
@@ -61,7 +65,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\WorldReader.cs" />
-    <Compile Include="Source\WorldReaderOld.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MinecraftMapReader.csproj.user" />

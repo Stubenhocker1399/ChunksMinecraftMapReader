@@ -4,6 +4,9 @@ using System.IO;
 using System;
 using Ionic.Zlib;
 using Chunks.Plugins;
+using Chunks.Entities;
+using Core;
+using System.Linq;
 
 namespace MinecraftMapReader.Source
 {
@@ -30,6 +33,134 @@ namespace MinecraftMapReader.Source
         static byte[] chunkData;
         [ThreadStatic]
         static byte chunkVersion;
+        [Initialization]
+        private static void OnPluginInitialize()
+        {
+            WorldManagement.WorldInitialized += OnWorldInitialized;
+        }
+
+        private static void OnWorldInitialized(IWorld world)
+        {
+            //world.CameraRig.Transform.Position = new Vector(1f, world.BlockSize * 5, 0f);
+            //world.GetAllComponents<SpectatorCameraController>().FirstOrDefault().Transform.Position = new Vector(2f, 4.3f, 2f);
+            worldfolder = world.Properties.SaveDirectory; 
+            if (File.Exists(worldfolder + "\\level.dat"))
+            {
+                byte[] leveldatcompressed = File.ReadAllBytes(worldfolder + "\\level.dat");
+                byte[] leveldat = Decompress(leveldatcompressed);
+
+                MemoryStream leveldatdecompressed = new MemoryStream(leveldat);
+                BinaryReader brleveldatdecomp = new BinaryReader(leveldatdecompressed);
+
+                int Tag, payloadSize, TagNameLength;
+                char[] TagName;
+                payloadSize = 0;
+                int payloadbyte = 0;
+                do
+                {
+                    Tag = leveldatdecompressed.ReadByte();
+                    if ((TAG)Tag != TAG.End)
+                        TagNameLength = Helpers.ReadInt16BE(brleveldatdecomp);
+                    else
+                        TagNameLength = 0;
+                    TagName = new char[TagNameLength];
+                    TagName = brleveldatdecomp.ReadChars(TagNameLength);
+                    switch ((TAG)Tag)
+                    {
+                        case TAG.Compound:
+                            break;
+                        case TAG.End:
+                            break;
+                        case TAG.Int:
+                            var payloadint = Helpers.ReadInt32BE(brleveldatdecomp);
+                            break;
+                        case TAG.Long:
+                            var payloadlong = Helpers.ReadInt64BE(brleveldatdecomp);
+                            break;
+                        case TAG.Double:
+                            var payloaddouble = Helpers.ReadInt64BE(brleveldatdecomp);
+                            break;
+                        case TAG.Byte:
+                            payloadbyte = leveldatdecompressed.ReadByte(); 
+                            break;
+                        case TAG.Byte_Array:
+                            payloadSize = Helpers.ReadInt32BE(brleveldatdecomp);                            
+                            leveldatdecompressed.Seek(payloadSize, SeekOrigin.Current);
+                            break;
+                        case TAG.Int_Array:
+                            payloadSize = Helpers.ReadInt32BE(brleveldatdecomp);
+                            leveldatdecompressed.Seek(payloadSize * 4, SeekOrigin.Current);
+                            break;
+                        case TAG.List:
+                            var tagId = leveldatdecompressed.ReadByte();
+                            payloadSize = Helpers.ReadInt32BE(brleveldatdecomp);
+                            break;
+                        case TAG.String:
+                            payloadSize = Helpers.ReadInt16BE(brleveldatdecomp);
+                            leveldatdecompressed.Seek(payloadSize, SeekOrigin.Current);
+                            break;
+                        default:
+                            Debug.Log("LEVEL.DAT ERRORTAG: UNKOWN TAG : " + (TAG)Tag);
+                            break;
+                    }
+                } while (new string(TagName) != "Data" && leveldatdecompressed.Position < leveldatdecompressed.Length);
+                Debug.Log("Found " + new string(TagName));
+
+
+
+                do
+                {
+                    Tag = leveldatdecompressed.ReadByte();
+                    if ((TAG)Tag != TAG.End)
+                        TagNameLength = Helpers.ReadInt16BE(brleveldatdecomp);
+                    else
+                        TagNameLength = 0;
+                    TagName = new char[TagNameLength];
+                    TagName = brleveldatdecomp.ReadChars(TagNameLength);
+                    switch ((TAG)Tag)
+                    {
+                        case TAG.Compound:
+                            break;
+                        case TAG.End:
+                            break;
+                        case TAG.Int:
+                            var payloadint = Helpers.ReadInt32BE(brleveldatdecomp);
+                            break;
+                        case TAG.Long:
+                            var payloadlong = Helpers.ReadInt64BE(brleveldatdecomp);
+                            break;
+                        case TAG.Double:
+                            var payloaddouble = Helpers.ReadInt64BE(brleveldatdecomp);
+                            break;
+                        case TAG.Byte:
+                            payloadbyte = leveldatdecompressed.ReadByte();
+                            break;
+                        case TAG.Byte_Array:
+                            payloadSize = Helpers.ReadInt32BE(brleveldatdecomp);
+                            leveldatdecompressed.Seek(payloadSize, SeekOrigin.Current);
+                            break;
+                        case TAG.Int_Array:
+                            payloadSize = Helpers.ReadInt32BE(brleveldatdecomp);
+                            leveldatdecompressed.Seek(payloadSize * 4, SeekOrigin.Current);
+                            break;
+                        case TAG.List:
+                            var tagId = leveldatdecompressed.ReadByte();
+                            payloadSize = Helpers.ReadInt32BE(brleveldatdecomp);
+                            break;
+                        case TAG.String:
+                            payloadSize = Helpers.ReadInt16BE(brleveldatdecomp);
+                            leveldatdecompressed.Seek(payloadSize, SeekOrigin.Current);
+                            break;
+                        default:
+                            Debug.Log("LEVEL.DAT ERRORTAG: UNKOWN TAG : " + (TAG)Tag);
+                            break;
+                    }
+                } while (new string(TagName) != "Player" && leveldatdecompressed.Position < leveldatdecompressed.Length);
+                Debug.Log("Found " + new string(TagName));
+
+            }
+        }
+
         protected override void GenerateChunkColumn(ChunkColumn chunks)
         {
             worldfolder = WorldProperties.SaveDirectory;
@@ -56,7 +187,6 @@ namespace MinecraftMapReader.Source
                         TagNameLength = Helpers.ReadInt16BE(br);
                     else
                         TagNameLength = 0;
-                    var tagreader = new StreamReader(uncompressedChunk);
                     TagName = new char[TagNameLength];
                     TagName = br.ReadChars(TagNameLength);
                     switch ((TAG)Tag)
@@ -70,7 +200,7 @@ namespace MinecraftMapReader.Source
                             break;
                         case TAG.Long:
                             var payloadlong = Helpers.ReadInt64BE(br);
-                            break;
+                            break;                        
                         case TAG.Byte:
                             payloadbyte = uncompressedChunk.ReadByte();
                             break;
@@ -107,7 +237,6 @@ namespace MinecraftMapReader.Source
                             TagNameLength = Helpers.ReadInt16BE(br);
                         else
                             TagNameLength = 0;
-                        var tagreader = new StreamReader(uncompressedChunk);
                         TagName = new char[TagNameLength];
                         TagName = br.ReadChars(TagNameLength);
                         switch ((TAG)Tag)
@@ -155,7 +284,6 @@ namespace MinecraftMapReader.Source
                             TagNameLength = Helpers.ReadInt16BE(br);
                         else
                             TagNameLength = 0;
-                        var tagreader = new StreamReader(uncompressedChunk);
                         TagName = new char[TagNameLength];
                         TagName = br.ReadChars(TagNameLength);
                         switch ((TAG)Tag)
@@ -203,7 +331,6 @@ namespace MinecraftMapReader.Source
                             TagNameLength = Helpers.ReadInt16BE(br);
                         else
                             TagNameLength = 0;
-                        var tagreader = new StreamReader(uncompressedChunk);
                         TagName = new char[TagNameLength];
                          TagName = br.ReadChars(TagNameLength);
                         switch ((TAG)Tag)
@@ -400,6 +527,32 @@ namespace MinecraftMapReader.Source
                     }
                 }
              */
+        }
+
+        static byte[] Decompress(byte[] gzip)
+        {
+            // Create a GZIP stream with decompression mode.
+            // ... Then create a buffer and write into while reading from the GZIP stream.
+            using (GZipStream stream = new GZipStream(new MemoryStream(gzip),
+                CompressionMode.Decompress))
+            {
+                const int size = 4096;
+                byte[] buffer = new byte[size];
+                using (MemoryStream memory = new MemoryStream())
+                {
+                    int count = 0;
+                    do
+                    {
+                        count = stream.Read(buffer, 0, size);
+                        if (count > 0)
+                        {
+                            memory.Write(buffer, 0, count);
+                        }
+                    }
+                    while (count > 0);
+                    return memory.ToArray();
+                }
+            }
         }
 
         private static MemoryStream decompressChunk(byte[] chunkData, int version)
