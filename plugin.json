@@ -8,7 +8,8 @@
     "tags": [ "generator" ],
 	"requires":
 	[
-	   { "name": "TerrainBlocks", "id": 576064238 }
+	   { "name": "TerrainBlocks", "id": 576064238 },
+     { "name": "Minecraft Blocks", "id":721598341 }
 	],
   "scripts": ["Binaries/MinecraftMapReader.dll"]
 }
