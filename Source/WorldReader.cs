@@ -64,7 +64,7 @@ namespace MinecraftMapReader.Source
             { 173, Plugin.GetResource<Block>("MinecraftBlocks.Coal") },
             { 206, Plugin.GetResource<Block>("MinecraftBlocks.EndBricks") }
         };
-        static string worldfolder;// = "C:\\Users\\Chris\\AppData\\LocalLow\\Facepunch Studios\\Chunks\\Worlds\\world";
+        static string worldfolder;
         [ThreadStatic]
         static byte[] chunkData;
         [ThreadStatic]
@@ -77,123 +77,22 @@ namespace MinecraftMapReader.Source
 
         private static void OnWorldInitialized(IWorld world)
         {
-            //world.CameraRig.Transform.Position = new Vector(1f, world.BlockSize * 5, 0f);
-            //world.GetAllComponents<SpectatorCameraController>().FirstOrDefault().Transform.Position = new Vector(2f, 4.3f, 2f);
-            worldfolder = world.Properties.SaveDirectory; 
+            //Teleport the player and Spectator camera to the last saved position in level.dat
+            worldfolder = world.Properties.SaveDirectory;
             if (File.Exists(worldfolder + "\\level.dat"))
             {
                 byte[] leveldatcompressed = File.ReadAllBytes(worldfolder + "\\level.dat");
                 byte[] leveldat = Decompress(leveldatcompressed);
 
-                MemoryStream leveldatdecompressed = new MemoryStream(leveldat);
-                BinaryReader brleveldatdecomp = new BinaryReader(leveldatdecompressed);
+                var nbt = NBTReader.readNBT(leveldat);
 
-                int Tag, payloadSize, TagNameLength;
-                char[] TagName;
-                payloadSize = 0;
-                int payloadbyte = 0;
-                do
-                {
-                    Tag = leveldatdecompressed.ReadByte();
-                    if ((TAG)Tag != TAG.End)
-                        TagNameLength = Helpers.ReadInt16BE(brleveldatdecomp);
-                    else
-                        TagNameLength = 0;
-                    TagName = new char[TagNameLength];
-                    TagName = brleveldatdecomp.ReadChars(TagNameLength);
-                    switch ((TAG)Tag)
-                    {
-                        case TAG.Compound:
-                            break;
-                        case TAG.End:
-                            break;
-                        case TAG.Int:
-                            var payloadint = Helpers.ReadInt32BE(brleveldatdecomp);
-                            break;
-                        case TAG.Long:
-                            var payloadlong = Helpers.ReadInt64BE(brleveldatdecomp);
-                            break;
-                        case TAG.Double:
-                            var payloaddouble = Helpers.ReadInt64BE(brleveldatdecomp);
-                            break;
-                        case TAG.Byte:
-                            payloadbyte = leveldatdecompressed.ReadByte(); 
-                            break;
-                        case TAG.Byte_Array:
-                            payloadSize = Helpers.ReadInt32BE(brleveldatdecomp);                            
-                            leveldatdecompressed.Seek(payloadSize, SeekOrigin.Current);
-                            break;
-                        case TAG.Int_Array:
-                            payloadSize = Helpers.ReadInt32BE(brleveldatdecomp);
-                            leveldatdecompressed.Seek(payloadSize * 4, SeekOrigin.Current);
-                            break;
-                        case TAG.List:
-                            var tagId = leveldatdecompressed.ReadByte();
-                            payloadSize = Helpers.ReadInt32BE(brleveldatdecomp);
-                            break;
-                        case TAG.String:
-                            payloadSize = Helpers.ReadInt16BE(brleveldatdecomp);
-                            leveldatdecompressed.Seek(payloadSize, SeekOrigin.Current);
-                            break;
-                        default:
-                            Debug.Log("LEVEL.DAT ERRORTAG: UNKOWN TAG : " + (TAG)Tag);
-                            break;
-                    }
-                } while (new string(TagName) != "Data" && leveldatdecompressed.Position < leveldatdecompressed.Length);
-                Debug.Log("Found " + new string(TagName));
+                var positionVector = new Vector(
+                    ((float)nbt.tree["Data"]["Player"]["Pos"][0]) * world.BlockSize,
+                    ((float)nbt.tree["Data"]["Player"]["Pos"][1]) * world.BlockSize,
+                    ((float)nbt.tree["Data"]["Player"]["Pos"][2]) * world.BlockSize);
 
-
-
-                do
-                {
-                    Tag = leveldatdecompressed.ReadByte();
-                    if ((TAG)Tag != TAG.End)
-                        TagNameLength = Helpers.ReadInt16BE(brleveldatdecomp);
-                    else
-                        TagNameLength = 0;
-                    TagName = new char[TagNameLength];
-                    TagName = brleveldatdecomp.ReadChars(TagNameLength);
-                    switch ((TAG)Tag)
-                    {
-                        case TAG.Compound:
-                            break;
-                        case TAG.End:
-                            break;
-                        case TAG.Int:
-                            var payloadint = Helpers.ReadInt32BE(brleveldatdecomp);
-                            break;
-                        case TAG.Long:
-                            var payloadlong = Helpers.ReadInt64BE(brleveldatdecomp);
-                            break;
-                        case TAG.Double:
-                            var payloaddouble = Helpers.ReadInt64BE(brleveldatdecomp);
-                            break;
-                        case TAG.Byte:
-                            payloadbyte = leveldatdecompressed.ReadByte();
-                            break;
-                        case TAG.Byte_Array:
-                            payloadSize = Helpers.ReadInt32BE(brleveldatdecomp);
-                            leveldatdecompressed.Seek(payloadSize, SeekOrigin.Current);
-                            break;
-                        case TAG.Int_Array:
-                            payloadSize = Helpers.ReadInt32BE(brleveldatdecomp);
-                            leveldatdecompressed.Seek(payloadSize * 4, SeekOrigin.Current);
-                            break;
-                        case TAG.List:
-                            var tagId = leveldatdecompressed.ReadByte();
-                            payloadSize = Helpers.ReadInt32BE(brleveldatdecomp);
-                            break;
-                        case TAG.String:
-                            payloadSize = Helpers.ReadInt16BE(brleveldatdecomp);
-                            leveldatdecompressed.Seek(payloadSize, SeekOrigin.Current);
-                            break;
-                        default:
-                            Debug.Log("LEVEL.DAT ERRORTAG: UNKOWN TAG : " + (TAG)Tag);
-                            break;
-                    }
-                } while (new string(TagName) != "Player" && leveldatdecompressed.Position < leveldatdecompressed.Length);
-                Debug.Log("Found " + new string(TagName));
-
+                world.CameraRig.Transform.Position = positionVector;
+                world.GetAllComponents<SpectatorCameraController>().FirstOrDefault().Transform.Position = positionVector;
             }
         }
 
@@ -210,226 +109,40 @@ namespace MinecraftMapReader.Source
                 var uncompressedChunk = decompressChunk(chunkData, chunkVersion);
                 uncompressedChunk.Seek(0, SeekOrigin.Begin);
                 var br = new BinaryReader(uncompressedChunk);
-                
-                #region readData
-                int Tag, payloadSize, TagNameLength;
-                char[] TagName;
-                payloadSize = 0;
-                int payloadbyte = 0;
-                do
-                {
-                    Tag = uncompressedChunk.ReadByte();
-                    if ((TAG)Tag != TAG.End)
-                        TagNameLength = Helpers.ReadInt16BE(br);
-                    else
-                        TagNameLength = 0;
-                    TagName = new char[TagNameLength];
-                    TagName = br.ReadChars(TagNameLength);
-                    switch ((TAG)Tag)
-                    {
-                        case TAG.Compound:
-                            break;
-                        case TAG.End:
-                            break;
-                        case TAG.Int:
-                            var payloadint = Helpers.ReadInt32BE(br);
-                            break;
-                        case TAG.Long:
-                            var payloadlong = Helpers.ReadInt64BE(br);
-                            break;                        
-                        case TAG.Byte:
-                            payloadbyte = uncompressedChunk.ReadByte();
-                            break;
-                        case TAG.Byte_Array:
-                            payloadSize =  Helpers.ReadInt32BE(br);
-                            uncompressedChunk.Seek(payloadSize, SeekOrigin.Current);
-                            break;
-                        case TAG.Int_Array:
-                           payloadSize = Helpers.ReadInt32BE(br);
-                            uncompressedChunk.Seek(payloadSize*4, SeekOrigin.Current);
-                            break;
-                        case TAG.List:
-                            var tagId = uncompressedChunk.ReadByte();
-                            payloadSize = Helpers.ReadInt32BE(br);
-                            break;
-                        case TAG.String:
-                            payloadSize = Helpers.ReadInt16BE(br);
-                            uncompressedChunk.Seek(payloadSize, SeekOrigin.Current);
-                            break;
-                        default:
-                            Debug.Log(chunks.Min.X + " " +chunks.Min.Z + "ERRORTAG: UNKOWN TAG : " + (TAG)Tag);
-                            break;
-                    }
-                } while (new string(TagName) != "Sections" && uncompressedChunk.Position < uncompressedChunk.Length);
-                var count = payloadSize;
+                var nbt = NBTReader.readNBT(uncompressedChunk.ToArray());
+                var sections = (NBTListTag)nbt.tree["Level"]["Sections"];
+                var sectionscount = sections.value.Count();
                 int yLevel = 0;
                 byte[] blocks = { 0 };
-                for (var i = 0; i < count; i++)//payloadSize is the amount of sections avaiable
+
+                for (var i = 0; i < sectionscount; i++)
                 {
-                    do
-                    {
-                        Tag = uncompressedChunk.ReadByte();
-                        if ((TAG)Tag != TAG.End)
-                            TagNameLength = Helpers.ReadInt16BE(br);
-                        else
-                            TagNameLength = 0;
-                        TagName = new char[TagNameLength];
-                        TagName = br.ReadChars(TagNameLength);
-                        switch ((TAG)Tag)
-                        {
-                            case TAG.Compound:
-                                break;
-                            case TAG.End:
-                                break;
-                            case TAG.Int:
-                                var payloadint = Helpers.ReadInt32BE(br);
-                                break;
-                            case TAG.Long:
-                                var payloadlong = Helpers.ReadInt64BE(br);
-                                break;
-                            case TAG.Byte:
-                                payloadbyte = uncompressedChunk.ReadByte();
-                                break;
-                            case TAG.Byte_Array:
-                                payloadSize = Helpers.ReadInt32BE(br);
-                                if(new string(TagName)!= "Blocks")
-                                    uncompressedChunk.Seek(payloadSize, SeekOrigin.Current);
-                                break;
-                            case TAG.Int_Array:
-                                payloadSize = Helpers.ReadInt32BE(br);
-                                uncompressedChunk.Seek(payloadSize * 4, SeekOrigin.Current);
-                                break;
-                            case TAG.List:
-                                var tagId = uncompressedChunk.ReadByte();
-                                payloadSize = Helpers.ReadInt32BE(br);
-                                break;
-                            case TAG.String:
-                                payloadSize = Helpers.ReadInt16BE(br);
-                                uncompressedChunk.Seek(payloadSize, SeekOrigin.Current);
-                                break;
-                            default:
-                                Debug.Log(chunks.Min.X + " " + chunks.Min.Z + "ERRORTAG: UNKOWN TAG : " + (TAG)Tag);
-                                break;
-                        }
-                    } while (new string(TagName) != "Blocks" && uncompressedChunk.Position < uncompressedChunk.Length);
-                    blocks = br.ReadBytes(payloadSize);
-                    do
-                    {
-                        Tag = uncompressedChunk.ReadByte();
-                        if ((TAG)Tag != TAG.End)
-                            TagNameLength = Helpers.ReadInt16BE(br);
-                        else
-                            TagNameLength = 0;
-                        TagName = new char[TagNameLength];
-                        TagName = br.ReadChars(TagNameLength);
-                        switch ((TAG)Tag)
-                        {
-                            case TAG.Compound:
-                                break;
-                            case TAG.End:
-                                break;
-                            case TAG.Int:
-                                var payloadint = Helpers.ReadInt32BE(br);
-                                break;
-                            case TAG.Long:
-                                var payloadlong = Helpers.ReadInt64BE(br);
-                                break;
-                            case TAG.Byte:
-                                payloadbyte = uncompressedChunk.ReadByte();
-                                break;
-                            case TAG.Byte_Array:
-                                payloadSize = Helpers.ReadInt32BE(br);
-                                if (new string(TagName) != "Blocks")
-                                    uncompressedChunk.Seek(payloadSize, SeekOrigin.Current);
-                                break;
-                            case TAG.Int_Array:
-                                payloadSize = Helpers.ReadInt32BE(br);
-                                uncompressedChunk.Seek(payloadSize * 4, SeekOrigin.Current);
-                                break;
-                            case TAG.List:
-                                var tagId = uncompressedChunk.ReadByte();
-                                 payloadSize = Helpers.ReadInt32BE(br);
-                                break;
-                            case TAG.String:
-                                payloadSize = Helpers.ReadInt16BE(br);
-                                uncompressedChunk.Seek(payloadSize, SeekOrigin.Current);
-                                break;
-                            default:
-                                Debug.Log(chunks.Min.X + " " + chunks.Min.Z + "ERRORTAG: UNKOWN TAG : " + (TAG)Tag);
-                                break;
-                        }
-                    } while (new string(TagName) != "Y" && uncompressedChunk.Position < uncompressedChunk.Length);
-                    yLevel = payloadbyte;
-                     do
-                    {
-                        Tag = uncompressedChunk.ReadByte();
-                        if ((TAG)Tag != TAG.End)
-                            TagNameLength = Helpers.ReadInt16BE(br);
-                        else
-                            TagNameLength = 0;
-                        TagName = new char[TagNameLength];
-                         TagName = br.ReadChars(TagNameLength);
-                        switch ((TAG)Tag)
-                        {
-                            case TAG.Compound:
-                                break;
-                            case TAG.End:
-                                break;
-                            case TAG.Int:
-                                var payloadint = Helpers.ReadInt32BE(br);
-                                break;
-                            case TAG.Long:
-                               var payloadlong = Helpers.ReadInt64BE(br);
-                                break;
-                            case TAG.Byte:
-                                payloadbyte = uncompressedChunk.ReadByte();
-                                break;
-                            case TAG.Byte_Array:
-                                payloadSize = Helpers.ReadInt32BE(br);
-                                if (new string(TagName) != "Blocks")
-                                    uncompressedChunk.Seek(payloadSize, SeekOrigin.Current);
-                                break;
-                            case TAG.Int_Array:
-                                payloadSize = Helpers.ReadInt32BE(br);
-                                uncompressedChunk.Seek(payloadSize * 4, SeekOrigin.Current);
-                                break;
-                            case TAG.List:
-                                var tagId = uncompressedChunk.ReadByte();
-                                 payloadSize = Helpers.ReadInt32BE(br);
-                                break;
-                            case TAG.String:
-                                payloadSize = Helpers.ReadInt16BE(br);
-                                uncompressedChunk.Seek(payloadSize, SeekOrigin.Current);
-                                break;
-                            default:
-                                Debug.Log(chunks.Min.X + " " + chunks.Min.Z + "ERRORTAG: UNKOWN TAG : " + (TAG)Tag);
-                                break;
-                        }
-                    } while ((new string(TagName) != "" && uncompressedChunk.Position < uncompressedChunk.Length) || Tag == -1);
+                    blocks = (byte[])sections[i]["Blocks"];
+                    yLevel = (int)sections[i]["Y"];
+
                     var ran = CreateRandom(chunks);
-                    for(var x=0; x< 16; x++)
+                    for (var x = 0; x < 16; x++)
                         for (var z = 0; z < 16; z++)
-                        { 
+                        {
                             for (var y = 0; y < 16; y++)
                             {
-                                int BlockPos = y*16*16+z*16+x;
-                                byte BlockID_a = blocks[BlockPos];                                
+                                int BlockPos = y * 16 * 16 + z * 16 + x;
+                                byte BlockID_a = blocks[BlockPos];
                                 Block block;
                                 Blocks.TryGetValue(BlockID_a, out block);
-                                if (block==default(Block))
+                                if (block == default(Block))
                                     block = Plugin.GetResource<Block>("Core.Test"); ;
                                 if (BlockID_a != 0)
-                                    chunks.Set(new IntVector(x + chunks.Min.X, y + (16 * yLevel), (15-z) + chunks.Min.Z), block);
+                                    chunks.Set(new IntVector(x + chunks.Min.X, y + (16 * yLevel), (15 - z) + chunks.Min.Z), block);
                             }
                         }
                 }
-                #endregion
             }
-            else //No chunk exists at given coorinates
+            else //No chunk exists at given coorinates, generate a simple flat terrain
             {
                 chunkData = new byte[] { 0x00 };
                 var rando = CreateRandom(chunks);
-                
+
                 for (var x = chunks.Min.X; x < chunks.Max.X; ++x)
                     for (var z = chunks.Min.Z; z < chunks.Max.Z; ++z)
                     {
@@ -437,19 +150,6 @@ namespace MinecraftMapReader.Source
                         chunks.Set(new IntVector(x, 0, z), grassBlock);
                     }
             }
-            /*
-            //Standing Platform to reach debug console, can be deleted later on 
-            var rand = CreateRandom(chunks);
-            for (var x = chunks.Min.X; x < chunks.Max.X; ++x)
-                for (var z = chunks.Min.Z; z < chunks.Max.Z; ++z)
-                {
-                    var grassBlock = GetBlock("Grass", ((float)rand.NextDouble() - 0.5f) * 0.25f);
-                    if (x > -20 && x < 20 && z > -20 && z < 20)
-                    {
-                        chunks.Set(new IntVector(x, 30, z), grassBlock);
-                    }
-                }
-             */
         }
 
         static byte[] Decompress(byte[] gzip)
@@ -496,11 +196,11 @@ namespace MinecraftMapReader.Source
             }
             else
             {
-                Debug.Log("Error mc-chunk compression version: " +version.ToString());
+                Debug.Log("Error mc-chunk compression version: " + version.ToString());
                 return null;
             }
         }
-        
+
         private static bool ChunkExistsAtCoords(int x, int z, out byte[] chunkData, out byte chunkVersion)
         {
             int chunkX = x / 16;
@@ -515,11 +215,11 @@ namespace MinecraftMapReader.Source
                     br.BaseStream.Position = 4 * ((chunkX & 31) + (chunkZ & 31) * 32);
                     var offset = br.ReadByte() << 16 | br.ReadByte() << 8 | br.ReadByte();
                     var sectorCount = br.ReadByte();
-                
-                    if (offset==0)//No chunk here :C
+
+                    if (offset == 0)//No chunk here :C
                     {
                         chunkVersion = 0;
-                        chunkData = new byte[] { 0x00 }; 
+                        chunkData = new byte[] { 0x00 };
                         return false;
                     }
                     //Chunk exists, get the version and data
@@ -534,18 +234,8 @@ namespace MinecraftMapReader.Source
             chunkVersion = 0;
             return false;
         }
-
-        private static int ThreeBytesToInt32BigEndian(byte[] buf, int i)
-        {
-            return (buf[i] << 24) | (buf[i + 1] << 16) | (buf[i + 2] << 8);
-        }
-
-        private static int FourBytesToInt32BigEndian(byte[] buf, int i)
-        {
-            return (buf[i] << 24) | (buf[i + 1] << 16) | (buf[i + 2] << 8) | buf[i + 3];
-        }
     }
-    
+
     public static class MissingExtensions
     {
         /// Only useful before .NET 4
@@ -558,55 +248,6 @@ namespace MinecraftMapReader.Source
             {
                 output.Write(buffer, 0, bytesRead);
             }
-        }
-    }
-    public static class Helpers
-    {
-        // Note this MODIFIES THE GIVEN ARRAY then returns a reference to the modified array.
-        public static byte[] Reverse(this byte[] b)
-        {
-            Array.Reverse(b);
-            return b;
-        }
-
-        public static UInt16 ReadUInt16BE(this BinaryReader binRdr)
-        {
-            return BitConverter.ToUInt16(binRdr.ReadBytesRequired(sizeof(UInt16)).Reverse(), 0);
-        }
-
-        public static Int16 ReadInt16BE(this BinaryReader binRdr)
-        {
-            return BitConverter.ToInt16(binRdr.ReadBytesRequired(sizeof(Int16)).Reverse(), 0);
-        }
-
-        public static UInt32 ReadUInt32BE(this BinaryReader binRdr)
-        {
-            return BitConverter.ToUInt32(binRdr.ReadBytesRequired(sizeof(UInt32)).Reverse(), 0);
-        }
-
-        public static Int32 ReadInt32BE(this BinaryReader binRdr)
-        {
-            return BitConverter.ToInt32(binRdr.ReadBytesRequired(sizeof(Int32)).Reverse(), 0);
-        }
-
-        public static UInt64 ReadUInt64BE(this BinaryReader binRdr)
-        {
-            return BitConverter.ToUInt64(binRdr.ReadBytesRequired(sizeof(UInt64)).Reverse(), 0);
-        }
-
-        public static Int64 ReadInt64BE(this BinaryReader binRdr)
-        {
-            return BitConverter.ToInt64(binRdr.ReadBytesRequired(sizeof(Int64)).Reverse(), 0);
-        }
-
-        public static byte[] ReadBytesRequired(this BinaryReader binRdr, int byteCount)
-        {
-            var result = binRdr.ReadBytes(byteCount);
-
-            if (result.Length != byteCount)
-                throw new EndOfStreamException(string.Format("{0} bytes required from stream, but only {1} returned.", byteCount, result.Length));
-
-            return result;
         }
     }
 }
