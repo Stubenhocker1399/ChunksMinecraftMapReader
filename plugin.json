@@ -2,7 +2,8 @@
     "title": "Minecraft Map Reader",
     "version": "0.3",
 
-    "description": "Imports Minecraft worlds, just place a Minecraft's 'world' folder inside chunks saves.",
+    "description": "Imports Minecraft worlds, just place a Minecraft's 'world' folder inside chunks saves and enable this plugin./n
+	C:\Users\%USERNAME%\AppData\Roaming\.minecraft\saves",
 	"icon": "icon.png",
     "authors": [ "Stubenhocker1399" ],
     "tags": [ "generator" ],

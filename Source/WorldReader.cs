@@ -13,21 +13,6 @@ namespace MinecraftMapReader.Source
 {
     public class WorldReader : ChunkGenerator
     {
-        private enum TAG
-        {
-            End = 0,
-            Byte = 1,
-            Short = 2,
-            Int = 3,
-            Long = 4,
-            Float = 5,
-            Double = 6,
-            Byte_Array = 7,
-            String = 8,
-            List = 9,
-            Compound = 10,
-            Int_Array = 11
-        }
         Dictionary<int, Block> Blocks = new Dictionary<int, Block>
         {
             { 1, Plugin.GetResource<Block>("MinecraftBlocks.MinecraftStone") },
