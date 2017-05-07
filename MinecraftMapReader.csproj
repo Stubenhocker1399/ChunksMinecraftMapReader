@@ -18,10 +18,9 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>Binaries\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,9 +31,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ionic.Zip.Reduced">
+    <Reference Include="Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Core\Binaries\Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.9000, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Chunks_Data\Managed\Ionic.Zip.Reduced.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -49,18 +52,28 @@
       <Private>false</Private>
       <SpecificVersion>false</SpecificVersion>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
       <HintPath>$(SolutionDir)..\Chunks_Data\Managed\Newtonsoft.Json.dll</HintPath>
       <Private>false</Private>
       <SpecificVersion>false</SpecificVersion>
     </Reference>
-    <ProjectReference Include="..\Core\Core.csproj">
-      <Project>{5266CF11-04D5-4678-851B-E9F95A9CAEF7}</Project>
-      <Name>Core</Name>
+    <Reference Include="Facepunch.Networking, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(SolutionDir)..\Chunks_Data\Managed\Facepunch.Networking.dll</HintPath>
+      <Private>false</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
+    <ProjectReference Include="..\FirstPersonPlayer\FirstPersonPlayer.csproj">
+      <Project>{CFFCA8FB-9907-4E59-80F8-F93DE74A7F62}</Project>
+      <Name>FirstPersonPlayer</Name>
     </ProjectReference>
     <ProjectReference Include="..\TerrainBlocks\TerrainBlocks.csproj">
       <Project>{6f0c8d87-7146-44c8-a5de-3fb447d44406}</Project>
       <Name>TerrainBlocks</Name>
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="E:\Program Files (x86)\Steam\steamapps\workshop\content\402800\721598341\Minecraft blocks.csproj">
+      <Project>{A40F9512-674A-4048-9390-27ED8319D45C}</Project>
+      <Name>Minecraft blocks</Name>
       <Private>false</Private>
     </ProjectReference>
   </ItemGroup>
@@ -70,15 +83,13 @@
     <Compile Include="Source\WorldReader.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
+    <None Include="icon.png" />
     <None Include="MinecraftMapReader.csproj.user" />
     <None Include="plugin.json" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <ProjectExtensions>
-    <VisualStudio>
-      <UserProperties plugin_1json__JSONSchema="Source\WorldReader.cs" />
-    </VisualStudio>
-  </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

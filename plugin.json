@@ -1,17 +1,16 @@
 {
-    "title": "Minecraft Map Reader",
-    "version": "0.3",
+  "title": "Minecraft Map Reader",
+  "version": "0.4",
 
-    "description": "Imports Minecraft worlds, just place a Minecraft's 'world' folder inside chunks saves and enable this plugin./n
-	C:\Users\%USERNAME%\AppData\Roaming\.minecraft\saves",
-	"icon": "icon.png",
-    "authors": [ "Stubenhocker1399" ],
-    "tags": [ "generator" ],
-	"requires":
-	[
-	   { "name": "TerrainBlocks", "id": 576064238 },
-     { "name": "Minecraft Blocks", "id":721598341 },
-     { "name": "FirstPersonPlayer" }
+  "description": "Import Minecraft worlds to chunks!\nJust copy a Minecraft world to chunks world folder and enable this plugin on that world in-game./nMinecraft save directory: C:\\Users\\%USERNAME%\\AppData\\Roaming\\.minecraft\\saves/nChunks save directory: C:\\Users\\%USERNAME%\\AppData\\LocalLow\\Facepunch Studios\\Chunks\\Worlds",
+  "icon": "icon.png",
+  "authors": [ "Stubenhocker1399" ],
+  "tags": [ "generator" ],
+  "requires": [
+    {
+      "name": "Minecraft Blocks",
+      "id": 721598341
+    }
   ],
-  "scripts": ["Binaries/MinecraftMapReader.dll"]
+  "scripts": [ "Binaries/MinecraftMapReader.dll" ]
 }
