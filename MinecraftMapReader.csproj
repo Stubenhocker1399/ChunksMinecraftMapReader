@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\BigEndianHelper.cs" />
+    <Compile Include="Source\Blocks.cs" />
     <Compile Include="Source\NBTReader.cs" />
     <Compile Include="Source\WorldReader.cs" />
   </ItemGroup>

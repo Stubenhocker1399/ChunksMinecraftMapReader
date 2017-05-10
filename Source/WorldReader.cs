@@ -11,121 +11,7 @@ namespace MinecraftMapReader.Source
 {
     public class WorldReader : ChunkGenerator
     {
-        Dictionary<int, Block> Blocks = new Dictionary<int, Block>
-        {
-            { 1, Plugin.GetResource<Block>("MinecraftTextures.stone") },
-            { 2, Plugin.GetResource<Block>("MinecraftTextures.grass") },
-            { 3, Plugin.GetResource<Block>("MinecraftTextures.dirt") },
-            { 4, Plugin.GetResource<Block>("MinecraftTextures.cobblestone") },
-            { 5, Plugin.GetResource<Block>("MinecraftTextures.planks_oak") },
-            { 6, Plugin.GetResource<Block>("MinecraftTextures.sapling_oak") },
-            { 7, Plugin.GetResource<Block>("MinecraftTextures.bedrock") },
-            { 8, Plugin.GetResource<Block>("MinecraftTextures.water_still") },
-            { 9, Plugin.GetResource<Block>("MinecraftTextures.water_still") },
-            { 10, Plugin.GetResource<Block>("MinecraftTextures.lava_still") },
-            { 11, Plugin.GetResource<Block>("MinecraftTextures.lava_still") },
-            { 12, Plugin.GetResource<Block>("MinecraftTextures.sand") },
-            { 13, Plugin.GetResource<Block>("MinecraftTextures.gravel") },
-            { 14, Plugin.GetResource<Block>("MinecraftTextures.gold_ore") },
-            { 15, Plugin.GetResource<Block>("MinecraftTextures.iron_ore") },
-            { 16, Plugin.GetResource<Block>("MinecraftTextures.coal_ore") },
-            { 17, Plugin.GetResource<Block>("MinecraftTextures.log_oak") },
-            { 18, Plugin.GetResource<Block>("MinecraftTextures.leaves_oak") },
-            { 19, Plugin.GetResource<Block>("MinecraftTextures.sponge") },
-            { 20, Plugin.GetResource<Block>("MinecraftTextures.glass") },
-            { 21, Plugin.GetResource<Block>("MinecraftTextures.lapis_ore") },
-            { 22, Plugin.GetResource<Block>("MinecraftTextures.lapis_block") },
-            { 25, Plugin.GetResource<Block>("MinecraftTextures.noteblock") },
-            { 27, Plugin.GetResource<Block>("MinecraftTextures.rail_golden") },
-            { 28, Plugin.GetResource<Block>("MinecraftTextures.rail_detector") },
-            { 30, Plugin.GetResource<Block>("MinecraftTextures.web") },
-            { 31, Plugin.GetResource<Block>("MinecraftTextures.tallgrass") },
-            { 32, Plugin.GetResource<Block>("MinecraftTextures.deadbush") },
-            { 35, Plugin.GetResource<Block>("MinecraftTextures.wool_colored_white") },
-            { 37, Plugin.GetResource<Block>("MinecraftTextures.flower_dandelion") },
-            { 38, Plugin.GetResource<Block>("MinecraftTextures.flower_rose") },
-            { 39, Plugin.GetResource<Block>("MinecraftTextures.mushroom_brown") },
-            { 40, Plugin.GetResource<Block>("MinecraftTextures.mushroom_red") },
-            { 41, Plugin.GetResource<Block>("MinecraftTextures.gold_block") },
-            { 42, Plugin.GetResource<Block>("MinecraftTextures.iron_block") },
-            { 45, Plugin.GetResource<Block>("MinecraftTextures.brick") },
-            { 48, Plugin.GetResource<Block>("MinecraftTextures.cobblestone_mossy") },
-            { 49, Plugin.GetResource<Block>("MinecraftTextures.obsidian") },
-            { 50, Plugin.GetResource<Block>("MinecraftTextures.torch_on") },
-            { 52, Plugin.GetResource<Block>("MinecraftTextures.mob_spawner") },
-            { 56, Plugin.GetResource<Block>("MinecraftTextures.diamond_ore") },
-            { 57, Plugin.GetResource<Block>("MinecraftTextures.diamond_block") },
-            { 59, Plugin.GetResource<Block>("MinecraftTextures.wheat_stage_0") },
-            { 64, Plugin.GetResource<Block>("MinecraftTextures.door_wood_lower") },
-            { 65, Plugin.GetResource<Block>("MinecraftTextures.ladder") },
-            { 66, Plugin.GetResource<Block>("MinecraftTextures.rail_normal") },
-            { 69, Plugin.GetResource<Block>("MinecraftTextures.lever") },
-            { 71, Plugin.GetResource<Block>("MinecraftTextures.door_iron_lower") },
-            { 73, Plugin.GetResource<Block>("MinecraftTextures.redstone_ore") },
-            { 75, Plugin.GetResource<Block>("MinecraftTextures.redstone_torch_off") },
-            { 76, Plugin.GetResource<Block>("MinecraftTextures.redstone_torch_on") },
-            { 79, Plugin.GetResource<Block>("MinecraftTextures.ice") },
-            { 80, Plugin.GetResource<Block>("MinecraftTextures.snow") },
-            { 82, Plugin.GetResource<Block>("MinecraftTextures.clay") },
-            { 87, Plugin.GetResource<Block>("MinecraftTextures.netherrack") },
-            { 88, Plugin.GetResource<Block>("MinecraftTextures.soul_sand") },
-            { 89, Plugin.GetResource<Block>("MinecraftTextures.glowstone") },
-            { 93, Plugin.GetResource<Block>("MinecraftTextures.repeater_off") },
-            { 94, Plugin.GetResource<Block>("MinecraftTextures.repeater_on") },
-            { 96, Plugin.GetResource<Block>("MinecraftTextures.trapdoor") },
-            { 98, Plugin.GetResource<Block>("MinecraftTextures.stonebrick") },
-            { 99, Plugin.GetResource<Block>("MinecraftTextures.mushroom_block_skin_brown") },
-            { 100, Plugin.GetResource<Block>("MinecraftTextures.mushroom_block_skin_red") },
-            { 101, Plugin.GetResource<Block>("MinecraftTextures.iron_bars") },
-            { 105, Plugin.GetResource<Block>("MinecraftTextures.melon_stem_disconnected") },
-            { 106, Plugin.GetResource<Block>("MinecraftTextures.vine") },
-            { 111, Plugin.GetResource<Block>("MinecraftTextures.waterlily") },
-            { 112, Plugin.GetResource<Block>("MinecraftTextures.nether_brick") },
-            { 115, Plugin.GetResource<Block>("MinecraftTextures.nether_wart_stage_0") },
-            { 121, Plugin.GetResource<Block>("MinecraftTextures.end_stone") },
-            { 122, Plugin.GetResource<Block>("MinecraftTextures.dragon_egg") },
-            { 123, Plugin.GetResource<Block>("MinecraftTextures.redstone_lamp_off") },
-            { 124, Plugin.GetResource<Block>("MinecraftTextures.redstone_lamp_on") },
-            { 127, Plugin.GetResource<Block>("MinecraftTextures.cocoa_stage_0") },
-            { 129, Plugin.GetResource<Block>("MinecraftTextures.emerald_ore") },
-            { 131, Plugin.GetResource<Block>("MinecraftTextures.trip_wire_source") },
-            { 132, Plugin.GetResource<Block>("MinecraftTextures.trip_wire") },
-            { 133, Plugin.GetResource<Block>("MinecraftTextures.emerald_block") },
-            { 138, Plugin.GetResource<Block>("MinecraftTextures.beacon") },
-            { 140, Plugin.GetResource<Block>("MinecraftTextures.flower_pot") },
-            { 141, Plugin.GetResource<Block>("MinecraftTextures.carrots_stage_0") },
-            { 142, Plugin.GetResource<Block>("MinecraftTextures.potatoes_stage_0") },
-            { 149, Plugin.GetResource<Block>("MinecraftTextures.comparator_off") },
-            { 150, Plugin.GetResource<Block>("MinecraftTextures.comparator_on") },
-            { 152, Plugin.GetResource<Block>("MinecraftTextures.redstone_block") },
-            { 153, Plugin.GetResource<Block>("MinecraftTextures.quartz_ore") },
-            { 157, Plugin.GetResource<Block>("MinecraftTextures.rail_activator") },
-            { 159, Plugin.GetResource<Block>("MinecraftTextures.hardened_clay_stained_white") },
-            { 161, Plugin.GetResource<Block>("MinecraftTextures.leaves_acacia") },
-            { 165, Plugin.GetResource<Block>("MinecraftTextures.slime") },
-            { 167, Plugin.GetResource<Block>("MinecraftTextures.iron_trapdoor") },
-            { 172, Plugin.GetResource<Block>("MinecraftTextures.hardened_clay") },
-            { 173, Plugin.GetResource<Block>("MinecraftTextures.coal_block") },
-            { 174, Plugin.GetResource<Block>("MinecraftTextures.ice_packed") },
-            { 175, Plugin.GetResource<Block>("MinecraftTextures.double_plant_sunflower_bottom") },
-            { 193, Plugin.GetResource<Block>("MinecraftTextures.door_spruce_lower") },
-            { 194, Plugin.GetResource<Block>("MinecraftTextures.door_birch_lower") },
-            { 195, Plugin.GetResource<Block>("MinecraftTextures.door_jungle_lower") },
-            { 196, Plugin.GetResource<Block>("MinecraftTextures.door_acacia_lower") },
-            { 197, Plugin.GetResource<Block>("MinecraftTextures.door_dark_oak_lower") },
-            { 198, Plugin.GetResource<Block>("MinecraftTextures.end_rod") },
-            { 199, Plugin.GetResource<Block>("MinecraftTextures.chorus_plant") },
-            { 200, Plugin.GetResource<Block>("MinecraftTextures.chorus_flower") },
-            { 201, Plugin.GetResource<Block>("MinecraftTextures.purpur_block") },
-            { 206, Plugin.GetResource<Block>("MinecraftTextures.end_bricks") },
-            { 207, Plugin.GetResource<Block>("MinecraftTextures.beetroots_stage_0") },
-            { 212, Plugin.GetResource<Block>("MinecraftTextures.frosted_ice_0") },
-            { 213, Plugin.GetResource<Block>("MinecraftTextures.magma") },
-            { 214, Plugin.GetResource<Block>("MinecraftTextures.nether_wart_block") },
-            { 215, Plugin.GetResource<Block>("MinecraftTextures.red_nether_brick") },
-            { 338, Plugin.GetResource<Block>("MinecraftTextures.reeds") },
-            { 389, Plugin.GetResource<Block>("MinecraftTextures.itemframe_background") },
-        };
+        
         static string worldfolder;
         [ThreadStatic]
         static byte[] chunkData;
@@ -166,7 +52,7 @@ namespace MinecraftMapReader.Source
 
         protected override void GenerateChunkColumn(ChunkColumn chunks)
         {
-            chunks.SaveOnGenerate = true;
+            //chunks.SaveOnGenerate = true;
             worldfolder = WorldProperties.SaveDirectory;
             if (!File.Exists(worldfolder + "\\level.dat"))
                 Debug.Log("Couldn't locate Minecraft world to import.");
@@ -198,7 +84,7 @@ namespace MinecraftMapReader.Source
                                 int BlockPos = y * 16 * 16 + z * 16 + x;
                                 byte BlockID_a = blocks[BlockPos];
                                 Block block;
-                                Blocks.TryGetValue(BlockID_a, out block);
+                                Blocks.blocks.TryGetValue(BlockID_a, out block);
                                 if (block == default(Block))
                                     block = Plugin.GetResource<Block>("MinecraftTextures.dirt"); //Core.Test
                                 if (BlockID_a != 0)
