@@ -6,6 +6,7 @@ using Ionic.Zlib;
 using Chunks.Plugins;
 using System.Linq;
 using System.Collections.Generic;
+using Core;
 
 namespace MinecraftMapReader.Source
 {
@@ -45,8 +46,8 @@ namespace MinecraftMapReader.Source
 
                 world.CameraRig.Transform.Position = positionVector;
                 world.SpectatorCamera.Transform.Position = positionVector;
-                //if(world.GetAllComponents<SpectatorCameraController>().FirstOrDefault()!=null) //optional json tag needs to be fixed
-                //    world.GetAllComponents<SpectatorCameraController>().FirstOrDefault().Transform.Position = positionVector;
+                if(world.GetAllComponents<SpectatorCameraController>().FirstOrDefault()!=null) 
+                    world.GetAllComponents<SpectatorCameraController>().FirstOrDefault().Transform.Position = positionVector;
             }
         }
 
