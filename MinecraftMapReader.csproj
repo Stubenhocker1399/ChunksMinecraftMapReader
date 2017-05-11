@@ -87,6 +87,7 @@
     <None Include=".gitignore" />
     <None Include="icon.png" />
     <None Include="MinecraftMapReader.csproj.user" />
+    <None Include="plugin - Copy.json" />
     <None Include="plugin.json" />
     <None Include="README.md" />
   </ItemGroup>
