@@ -14,14 +14,16 @@ namespace MinecraftMapReader.Source
     {
         
         static string worldfolder;
-        [ThreadStatic]
-        static byte[] chunkData;
-        [ThreadStatic]
-        static byte chunkVersion;
         [Initialization]
         private static void OnPluginInitialize()
         {
             WorldManagement.WorldInitialized += OnWorldInitialized;
+        }
+        Blocks blocksDict;
+        protected override void OnInitialize()
+        {
+            base.OnInitialize();
+            blocksDict = new Blocks();
         }
 
         private static void OnWorldInitialized(IWorld world)
@@ -53,6 +55,8 @@ namespace MinecraftMapReader.Source
 
         protected override void GenerateChunkColumn(ChunkColumn chunks)
         {
+            byte[] chunkData;
+            byte chunkVersion;
             //chunks.SaveOnGenerate = true;
             worldfolder = WorldProperties.SaveDirectory;
             if (!File.Exists(worldfolder + "\\level.dat"))
@@ -85,7 +89,7 @@ namespace MinecraftMapReader.Source
                                 int BlockPos = y * 16 * 16 + z * 16 + x;
                                 byte BlockID_a = blocks[BlockPos];
                                 Block block;
-                                Blocks.blocks.TryGetValue(BlockID_a, out block);
+                                blocksDict.blocks.TryGetValue(BlockID_a, out block);
                                 if (block == default(Block))
                                     block = Plugin.GetResource<Block>("MinecraftTextures.dirt"); //Core.Test
                                 if (BlockID_a != 0)

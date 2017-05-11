@@ -9,7 +9,7 @@ namespace MinecraftMapReader.Source
 {
     class Blocks
     {
-        public static Dictionary<int, Block> blocks = new Dictionary<int, Block>
+        public Dictionary<int, Block> blocks = new Dictionary<int, Block>
         {
             { 1, Plugin.GetResource<Block>("MinecraftTextures.stone") },
             { 2, Plugin.GetResource<Block>("MinecraftTextures.grass") },
