@@ -6,7 +6,7 @@
   "icon": "icon.png",
   "authors": [ "Stubenhocker1399" ],
   "tags": [ "generator" ],
-  "requires": [ { "name": "MinecraftTextures" },
+  "requires": [ { "name": "MinecraftTextures", "id": 921148470 },
        { "name": "Core", "id": 542907495 } ],
   "optimal": [ "FirstPersonPlayer" ],
   "scripts": [ "Binaries/MinecraftMapReader.dll" ]

@@ -5,7 +5,6 @@ using System;
 using Ionic.Zlib;
 using Chunks.Plugins;
 using System.Linq;
-using System.Collections.Generic;
 using Core;
 
 namespace MinecraftMapReader.Source
@@ -32,19 +31,14 @@ namespace MinecraftMapReader.Source
             worldfolder = world.Properties.SaveDirectory;
             if (Directory.Exists(worldfolder + "\\playerdata"))
             {
-                //byte[] leveldatcompressed = File.ReadAllBytes(worldfolder + "\\level.dat");
                 var playerdatafolder = new DirectoryInfo(worldfolder + "\\playerdata");
                 byte[] leveldatcompressed = File.ReadAllBytes(playerdatafolder.GetFiles().OrderByDescending(f => f.LastWriteTime).First().FullName);
-                Debug.Log(playerdatafolder.GetFiles().OrderByDescending(f => f.LastWriteTime).First().FullName);
                 byte[] leveldat = Decompress(leveldatcompressed);
                 var nbt = NBTReader.readNBT(leveldat);
                 var positionVector = new Vector(
                     ((float)nbt.tree["Pos"][0]) * world.BlockSize,
                     ((float)nbt.tree["Pos"][1]+1) * world.BlockSize,
                     (-(float)nbt.tree["Pos"][2]+16) * world.BlockSize);
-                /*((float)nbt.tree["Data"]["Player"]["Pos"][0]) * world.BlockSize,
-                    ((float)nbt.tree["Data"]["Player"]["Pos"][1]+1) * world.BlockSize,
-                    ((float)nbt.tree["Data"]["Player"]["Pos"][2]+15) * world.BlockSize);*/
 
                 world.CameraRig.Transform.Position = positionVector;
                 world.SpectatorCamera.Transform.Position = positionVector;
@@ -57,10 +51,9 @@ namespace MinecraftMapReader.Source
         {
             byte[] chunkData;
             byte chunkVersion;
-            //chunks.SaveOnGenerate = true;
-            worldfolder = WorldProperties.SaveDirectory;
+            chunks.SaveOnGenerate = true;
             if (!File.Exists(worldfolder + "\\level.dat"))
-                Debug.Log("Couldn't locate Minecraft world to import.");
+                Debug.Log("MinecraftMapReader: Error Couldn't locate Minecraft world to import from, make sure you enable this plugin on a minecraft world folder.");
 
             chunkData = new byte[] { 0x00 };
             chunkVersion = 0x00;
@@ -82,8 +75,7 @@ namespace MinecraftMapReader.Source
 
                     var ran = CreateRandom(chunks);
                     for (var x = 0; x < 16; x++)
-                        for (var z = 0; z < 16; z++)
-                        {
+                        for (var z = 0; z < 16; z++)                            
                             for (var y = 0; y < 16; y++)
                             {
                                 int BlockPos = y * 16 * 16 + z * 16 + x;
@@ -95,7 +87,6 @@ namespace MinecraftMapReader.Source
                                 if (BlockID_a != 0)
                                     chunks.Set(new IntVector(x + chunks.Min.X, y + (16 * yLevel), (15 - z) + chunks.Min.Z), block);
                             }
-                        }
                 }
             }
             else //No chunk exists at given coorinates, generate a simple flat terrain
@@ -156,7 +147,7 @@ namespace MinecraftMapReader.Source
             }
             else
             {
-                Debug.Log("Error mc-chunk compression version: " + version.ToString());
+                Debug.Log("MinecraftMapReader: Error mc-chunk compression version: " + version.ToString() + " Could not read chunk.");
                 return null;
             }
         }
